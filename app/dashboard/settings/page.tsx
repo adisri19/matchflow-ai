@@ -71,7 +71,7 @@ export default function SettingsPage() {
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64 p-8 space-y-8">
+      <div className="flex-1 ml-0 md:ml-64 pt-20 md:pt-8 p-4 md:p-8 space-y-8">
         
         {/* Header */}
         <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-3xl border border-rose-100/50 dark:border-zinc-900 shadow-sm relative overflow-hidden">

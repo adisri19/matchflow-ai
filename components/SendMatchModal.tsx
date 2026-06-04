@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Profile } from "@/types";
-import { X, Sparkles, Send, CheckCircle2, AlertCircle, Loader2, Heart } from "lucide-react";
+import { X, Sparkles, Send, AlertCircle, Loader2, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface SendMatchModalProps {
@@ -11,6 +11,7 @@ interface SendMatchModalProps {
   customer: Profile;
   candidate: Profile;
   onSuccess: (message: string) => void;
+  onMarkAsSent: () => void;
 }
 
 export default function SendMatchModal({
@@ -19,6 +20,7 @@ export default function SendMatchModal({
   customer,
   candidate,
   onSuccess,
+  onMarkAsSent,
 }: SendMatchModalProps) {
   const [loading, setLoading] = useState(true);
   const [introText, setIntroText] = useState("");
@@ -45,7 +47,6 @@ export default function SendMatchModal({
           throw new Error(data.error || "Failed to generate AI introduction.");
         }
 
-        // Parse subject and body out of the OpenAI response
         const text = data.intro;
         const subjectMatch = text.match(/Subject:\s*(.*)/i);
         if (subjectMatch) {
@@ -71,9 +72,15 @@ export default function SendMatchModal({
     fetchIntro();
   }, [isOpen, customer, candidate]);
 
-  const handleSend = () => {
-    // Simulate sending
-    onSuccess(`Introduction successfully sent to ${customer.firstName} and ${candidate.firstName}!`);
+  const handleCopy = () => {
+    const textToCopy = `Subject: ${subject}\n\n${introText}`;
+    navigator.clipboard.writeText(textToCopy);
+    onSuccess("Proposal email copied to clipboard!");
+  };
+
+  const handleMarkAsSent = () => {
+    onMarkAsSent();
+    onSuccess(`Match proposal marked as sent to ${customer.firstName} and ${candidate.firstName}!`);
     onClose();
   };
 
@@ -103,7 +110,7 @@ export default function SendMatchModal({
           <div className="p-6 border-b border-rose-50 dark:border-zinc-900 flex items-center justify-between bg-gradient-to-r from-rose-50/30 to-peach-50/20 dark:from-zinc-900/30">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
-                <Sparkles className="h-4.5 w-4.5 text-rose-500" />
+                <Sparkles className="h-4.5 w-4.5 text-rose-505" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-800 dark:text-zinc-100">
@@ -217,18 +224,19 @@ export default function SendMatchModal({
           {/* Footer */}
           <div className="p-6 border-t border-rose-50 dark:border-zinc-900 flex justify-end gap-3 bg-slate-50/50 dark:bg-zinc-900/10">
             <button
-              onClick={onClose}
-              className="px-5 py-2.5 rounded-xl border border-rose-100 dark:border-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-rose-50 dark:hover:bg-zinc-900 text-xs font-semibold transition-all cursor-pointer"
+              onClick={handleCopy}
+              disabled={loading}
+              className="px-4 py-2.5 rounded-xl border border-rose-100 dark:border-zinc-800 text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              Cancel
+              <span>Copy Email</span>
             </button>
             <button
-              onClick={handleSend}
+              onClick={handleMarkAsSent}
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl bg-gradient-rose-peach hover:shadow-lg hover:shadow-rose-500/20 text-white text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="px-5 py-2.5 rounded-xl bg-gradient-rose-peach hover:shadow-lg hover:shadow-rose-500/20 text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none border-none"
             >
               <Send className="h-3.5 w-3.5" />
-              <span>Send Match Proposal</span>
+              <span>Mark as Sent</span>
             </button>
           </div>
         </motion.div>

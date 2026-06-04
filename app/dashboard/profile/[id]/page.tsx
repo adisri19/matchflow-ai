@@ -105,7 +105,7 @@ export default function ProfileDetailPage() {
     return (
       <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 flex">
         <Sidebar />
-        <div className="flex-1 ml-64 flex items-center justify-center">
+        <div className="flex-1 ml-0 md:ml-64 pt-20 md:pt-8 p-4 md:p-8 flex items-center justify-center">
           <div className="text-center space-y-3">
             <Loader2 className="h-8 w-8 text-rose-500 animate-spin mx-auto" />
             <p className="text-sm text-slate-500">Loading client workspace...</p>
@@ -119,7 +119,7 @@ export default function ProfileDetailPage() {
     return (
       <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 flex">
         <Sidebar />
-        <div className="flex-1 ml-64 p-8">
+        <div className="flex-1 ml-0 md:ml-64 pt-20 md:pt-8 p-4 md:p-8">
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl text-center space-y-4 max-w-md mx-auto mt-20">
             <h3 className="font-bold text-slate-800 dark:text-zinc-100 text-lg">Profile Not Found</h3>
             <p className="text-xs text-muted-foreground">The specified client profile does not exist.</p>
@@ -140,7 +140,7 @@ export default function ProfileDetailPage() {
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64 p-8 space-y-6">
+      <div className="flex-1 ml-0 md:ml-64 pt-20 md:pt-8 p-4 md:p-8 space-y-6">
         
         {/* Back navigation & Header */}
         <div className="flex items-center gap-3">

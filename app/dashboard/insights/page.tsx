@@ -8,16 +8,34 @@ import {
   TrendingUp, 
   Sparkles, 
   MapPin, 
-  Heart, 
-  Award, 
   PieChart, 
-  CheckCircle,
-  Users
+  LineChart as LineChartIcon,
+  Activity
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { 
+  ResponsiveContainer, 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  LineChart, 
+  Line, 
+  CartesianGrid 
+} from "recharts";
+
+const matchHistoryData = [
+  { month: "Jan", matches: 45 },
+  { month: "Feb", matches: 58 },
+  { month: "Mar", matches: 64 },
+  { month: "Apr", matches: 72 },
+  { month: "May", matches: 85 },
+  { month: "Jun", matches: 98 },
+];
 
 export default function InsightsPage() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     male: 0,
@@ -30,6 +48,7 @@ export default function InsightsPage() {
   });
 
   useEffect(() => {
+    setMounted(true);
     async function loadStats() {
       const all = await ProfileService.getAllProfiles();
       setProfiles(all);
@@ -87,12 +106,12 @@ export default function InsightsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 flex">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 flex font-sans">
       {/* Sidebar Navigation */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64 p-8 space-y-8">
+      <div className="flex-1 ml-0 md:ml-64 pt-20 md:pt-8 p-4 md:p-8 space-y-8 overflow-y-auto">
         
         {/* Header */}
         <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-3xl border border-rose-100/50 dark:border-zinc-900 shadow-sm relative overflow-hidden">
@@ -155,21 +174,23 @@ export default function InsightsPage() {
               <PieChart className="h-4.5 w-4.5 text-rose-500" />
               <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">Religious Demographics</h4>
             </div>
-            <div className="space-y-3.5">
-              {stats.religionCounts.map((r) => {
-                const pct = Math.round((r.count / stats.total) * 100);
-                return (
-                  <div key={r.name} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                      <span>{r.name}</span>
-                      <span>{r.count} ({pct}%)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-zinc-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-gradient-rose-peach h-full rounded-full" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="h-[240px] flex items-center justify-center">
+              {mounted ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.religionCounts} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="name" tick={{ fontSize: 9 }} stroke="#94a3b8" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: "#1e293b", border: "none", borderRadius: "8px", color: "#fff", fontSize: "11px" }}
+                    />
+                    <Bar dataKey="count" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
+                  Loading demographics...
+                </div>
+              )}
             </div>
           </div>
 
@@ -179,24 +200,54 @@ export default function InsightsPage() {
               <MapPin className="h-4.5 w-4.5 text-rose-500" />
               <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">Top Geographic Centers</h4>
             </div>
-            <div className="space-y-3.5">
-              {stats.cityCounts.map((c) => {
-                const pct = Math.round((c.count / stats.total) * 100);
-                return (
-                  <div key={c.name} className="space-y-1">
-                    <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-zinc-300">
-                      <span>{c.name}</span>
-                      <span>{c.count} clients</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-zinc-900 h-2 rounded-full overflow-hidden">
-                      <div className="bg-slate-700 dark:bg-zinc-700 h-full rounded-full" style={{ width: `${pct * 3}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="h-[240px] flex items-center justify-center">
+              {mounted ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.cityCounts} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="name" tick={{ fontSize: 9 }} stroke="#94a3b8" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: "#1e293b", border: "none", borderRadius: "8px", color: "#fff", fontSize: "11px" }}
+                    />
+                    <Bar dataKey="count" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
+                  Loading location centers...
+                </div>
+              )}
             </div>
           </div>
 
+        </div>
+
+        {/* Matches Proposed Over Time Full Width Line Chart */}
+        <div className="bg-white dark:bg-zinc-950 border border-rose-100/50 dark:border-zinc-900 rounded-3xl p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-rose-50 dark:border-zinc-900/50">
+            <Activity className="h-4.5 w-4.5 text-rose-500" />
+            <h4 className="text-sm font-bold text-slate-800 dark:text-zinc-200">Matches Proposed Over Time</h4>
+          </div>
+          <div className="h-[260px] flex items-center justify-center">
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={matchHistoryData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:hidden" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" className="hidden dark:block" />
+                  <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                  <YAxis tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: "#1e293b", border: "none", borderRadius: "8px", color: "#fff", fontSize: "11px" }}
+                  />
+                  <Line type="monotone" dataKey="matches" stroke="#f43f5e" strokeWidth={3} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-xs text-muted-foreground">
+                Loading history chart...
+              </div>
+            )}
+          </div>
         </div>
 
         {/* AI Trends Commentary */}

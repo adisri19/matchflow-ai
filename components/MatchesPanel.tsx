@@ -277,6 +277,11 @@ export default function MatchesPanel({ customer, allProfiles, onSuccessToast }: 
           customer={customer}
           candidate={selectedMatch}
           onSuccess={onSuccessToast}
+          onMarkAsSent={() => {
+            const savedSent = localStorage.getItem("matchflow_sent_packets");
+            const current = savedSent ? parseInt(savedSent) || 12 : 12;
+            localStorage.setItem("matchflow_sent_packets", String(current + 1));
+          }}
         />
       )}
     </div>
