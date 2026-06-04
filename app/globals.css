@@ -131,3 +131,10 @@ body {
     background: linear-gradient(135deg, #1b0e12 0%, #150b0f 100%);
   }
 }
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
