@@ -29,10 +29,21 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Get current authenticated user safely
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const isMockMode = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("dummy.supabase.co");
+
+  let user = null;
+  if (isMockMode) {
+    const mockCookie = request.cookies.get("mock_session")?.value;
+    if (mockCookie) {
+      user = { email: mockCookie };
+    }
+  } else {
+    // Get current authenticated user safely
+    const {
+      data: { user: supabaseUser },
+    } = await supabase.auth.getUser();
+    user = supabaseUser;
+  }
 
   const { pathname } = request.nextUrl;
 

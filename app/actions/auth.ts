@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabaseServer";
 import { isAllowed } from "@/lib/allowedUsers";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 export type AuthState = {
   error?: string;
@@ -20,6 +21,17 @@ export async function login(state: AuthState, formData: FormData): Promise<AuthS
   // Double check allowlist even on login just in case
   if (!isAllowed(email)) {
     return { error: "Access restricted to authorized matchmakers." };
+  }
+
+  const isMockMode = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("dummy.supabase.co");
+
+  if (isMockMode) {
+    if (email === "demo@tdc.com" && password !== "Demo@123") {
+      return { error: "Invalid password for Demo account." };
+    }
+    const cookieStore = await cookies();
+    cookieStore.set("mock_session", email, { path: "/" });
+    redirect("/dashboard");
   }
 
   const supabase = await createClient();
@@ -82,6 +94,14 @@ export async function signup(state: AuthState, formData: FormData): Promise<Auth
   // Server-side allowlist enforcement
   if (!isAllowed(email)) {
     return { error: "Access restricted to authorized matchmakers." };
+  }
+
+  const isMockMode = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("dummy.supabase.co");
+
+  if (isMockMode) {
+    const cookieStore = await cookies();
+    cookieStore.set("mock_session", email, { path: "/" });
+    redirect("/dashboard");
   }
 
   const supabase = await createClient();
