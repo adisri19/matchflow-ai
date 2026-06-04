@@ -38,9 +38,8 @@ export default function Sidebar() {
     },
     {
       name: "Success Stories",
-      href: "#",
+      href: "/dashboard/success",
       icon: UserCheck,
-      disabled: true,
     },
     {
       name: "Insights",
