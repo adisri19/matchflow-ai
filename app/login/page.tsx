@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, startTransition } from "react";
 import { login, AuthState } from "../actions/auth";
 import Link from "next/link";
 import { Heart, Sparkles, User, Lock, Mail, Loader2, ArrowRight } from "lucide-react";
@@ -23,8 +23,10 @@ export default function LoginPage() {
     formData.append("email", "demo@tdc.com");
     formData.append("password", "Demo@123");
     
-    // Trigger Server Action
-    formAction(formData);
+    // Trigger Server Action inside transition
+    startTransition(() => {
+      formAction(formData);
+    });
   };
 
   return (

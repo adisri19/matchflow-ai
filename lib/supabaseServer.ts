@@ -6,6 +6,34 @@ export async function createClient() {
 
   const isMockMode = !process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes("dummy.supabase.co");
 
+  if (isMockMode) {
+    return {
+      auth: {
+        getUser: async () => {
+          const hasMockCookie = cookieStore.has("mock_session");
+          if (hasMockCookie) {
+            const email = cookieStore.get("mock_session")?.value || "demo@tdc.com";
+            return {
+              data: {
+                user: {
+                  id: "mock-user-id-123",
+                  email: email,
+                  user_metadata: { role: "matchmaker" },
+                } as any,
+              },
+              error: null,
+            };
+          }
+          return { data: { user: null }, error: new Error("No session") as any };
+        },
+        signOut: async () => {
+          cookieStore.delete("mock_session");
+          return { error: null };
+        }
+      }
+    } as any;
+  }
+
   const client = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummy.supabase.co",
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "dummy-anon-key",
@@ -26,34 +54,6 @@ export async function createClient() {
       },
     }
   );
-
-  if (isMockMode) {
-    const originalAuth = client.auth;
-    client.auth = {
-      ...originalAuth,
-      getUser: async () => {
-        const hasMockCookie = cookieStore.has("mock_session");
-        if (hasMockCookie) {
-          const email = cookieStore.get("mock_session")?.value || "demo@tdc.com";
-          return {
-            data: {
-              user: {
-                id: "mock-user-id-123",
-                email: email,
-                user_metadata: { role: "matchmaker" },
-              } as any,
-            },
-            error: null,
-          };
-        }
-        return { data: { user: null }, error: new Error("No session") as any };
-      },
-      signOut: async () => {
-        cookieStore.delete("mock_session");
-        return { error: null };
-      }
-    } as any;
-  }
 
   return client;
 }
