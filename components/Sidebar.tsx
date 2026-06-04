@@ -29,8 +29,7 @@ export default function Sidebar() {
     }
     getUser();
   }, [supabase]);
-
-  const navItems = [
+  const navItems: { name: string; href: string; icon: any; disabled?: boolean }[] = [
     {
       name: "Clients",
       href: "/dashboard",
@@ -43,15 +42,13 @@ export default function Sidebar() {
     },
     {
       name: "Insights",
-      href: "#",
+      href: "/dashboard/insights",
       icon: TrendingUp,
-      disabled: true,
     },
     {
       name: "Settings",
-      href: "#",
+      href: "/dashboard/settings",
       icon: Settings,
-      disabled: true,
     },
   ];
 
